@@ -1,0 +1,353 @@
+newman
+
+Balai Pensi API QA - Black-Box Testing
+
+□ TS-API-01 | Portal & Routing Publik
+└ TC-API-001 | GET / (redirect ke portal SSO)
+  GET https://www.balaipensi.my.id/ [302 Moved Temporarily, 348B, 539ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 302
+  √  [VERIFIKASI_STRUKTUR] Header Location mengarah ke /sso/index.php
+  √  [VERIFIKASI_STRUKTUR] Content-Type berupa HTML
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms
+
+└ TC-API-002 | GET /sso/index.php (portal layanan)
+  GET https://www.balaipensi.my.id/sso/index.php [200 OK, 9.52kB, 168ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+  √  [VERIFIKASI_STRUKTUR] Content-Type berupa HTML
+  √  [VERIFIKASI_STRUKTUR] Halaman memuat judul portal
+  √  [VERIFIKASI_STRUKTUR] Halaman memuat tautan Login Pegawai (SSO)
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms
+
+└ TC-API-003 | GET /sso/ (directory index)
+  GET https://www.balaipensi.my.id/sso/ [200 OK, 9.41kB, 296ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+  √  [VERIFIKASI_STRUKTUR] Halaman memuat judul portal
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms
+
+└ TC-API-004 | GET /index.php (redirect internal)
+  GET https://www.balaipensi.my.id/index.php [200 OK, 9.41kB, 318ms]
+  √  [VERIFIKASI_STATUS] Kode status akhir HTTP = 200
+  √  [VERIFIKASI_STRUKTUR] Halaman akhir adalah portal layanan
+
+└ TC-API-005 | GET halaman tidak ada (404)
+  GET https://www.balaipensi.my.id/halaman-tidak-ada-qa-2026 [404 Not Found, 1.46kB, 191ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 404
+  √  [VERIFIKASI_STRUKTUR] Content-Type berupa HTML
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms
+
+└ TC-API-006 | HEAD /sso/index.php (metadata respons)
+  HEAD https://www.balaipensi.my.id/sso/index.php [200 OK, 444B, 475ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+  √  [VERIFIKASI_KEAMANAN] Header Strict-Transport-Security tersedia
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms
+
+□ TS-API-02 | Halaman Login & Sesi
+└ TC-API-007 | GET /sso/login.php (form login pegawai)
+  GET https://www.balaipensi.my.id/sso/login.php [200 OK, 5.83kB, 379ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+  √  [VERIFIKASI_STRUKTUR] Judul halaman adalah Login Pegawai SSO
+  √  [VERIFIKASI_STRUKTUR] Form memuat field username dan password
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms
+
+└ TC-API-008 | GET /login.php (form login admin)
+  GET https://www.balaipensi.my.id/login.php [200 OK, 1.33kB, 147ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+  √  [VERIFIKASI_STRUKTUR] Judul halaman adalah Login Admin
+  √  [VERIFIKASI_STRUKTUR] Form memuat field username dan password
+
+└ TC-API-009 | GET /yanlik/login.php (login admin survei)
+  GET https://www.balaipensi.my.id/yanlik/login.php [200 OK, 1.44kB, 112ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+  √  [VERIFIKASI_STRUKTUR] Judul halaman adalah Login Admin
+
+└ TC-API-010 | GET /sso/dashboard.php tanpa sesi
+  GET https://www.balaipensi.my.id/sso/dashboard.php [302 Moved Temporarily, 456B, 205ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 302
+  √  [VERIFIKASI_KEAMANAN] Redirect menuju halaman login
+
+└ TC-API-011 | GET /sso/logout.php tanpa sesi
+  GET https://www.balaipensi.my.id/sso/logout.php [302 Moved Temporarily, 545B, 211ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 302
+  √  [VERIFIKASI_STRUKTUR] Redirect menuju halaman login
+
+□ TS-API-03 | Endpoint AJAX get_pegawai
+└ TC-API-012 | GET ?q=an (pencarian valid)
+  GET https://www.balaipensi.my.id/yanlik/get_pegawai.php?q=an [200 OK, 1.23kB, 243ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+  √  [VERIFIKASI_STRUKTUR] Content-Type application/json
+  √  [VERIFIKASI_STRUKTUR] Body berupa array JSON tidak kosong
+  √  [VERIFIKASI_STRUKTUR] Setiap item memiliki nama_pegawai dan nip berupa string
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 2000 ms
+
+└ TC-API-013 | GET ?q=zzzz_tidak_ada (hasil kosong)
+  GET https://www.balaipensi.my.id/yanlik/get_pegawai.php?q=zzzz_tidak_ada_qa_2026 [200 OK, 466B, 159ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+  √  [VERIFIKASI_STRUKTUR] Body berupa array JSON kosong
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 2000 ms
+
+└ TC-API-014 | GET tanpa parameter q (parameter wajib)
+  GET https://www.balaipensi.my.id/yanlik/get_pegawai.php [200 OK, 466B, 354ms]
+  1. [VERIFIKASI_STATUS] Kode status HTTP = 400 untuk parameter wajib yang hilang
+  √  [VERIFIKASI_STRUKTUR] Body tetap berupa array JSON
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 2000 ms
+
+└ TC-API-015 | GET ?q=a (batas panjang kata kunci)
+  GET https://www.balaipensi.my.id/yanlik/get_pegawai.php?q=a [200 OK, 1.19kB, 145ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+  √  [VERIFIKASI_STRUKTUR] Body berupa array JSON
+  √  [VERIFIKASI_STRUKTUR] Kata kunci 1 karakter tetap dilayani tanpa error
+
+└ TC-API-016 | GET ?q=%27 (karakter kutip tunggal)
+  GET https://www.balaipensi.my.id/yanlik/get_pegawai.php?q=%27 [200 OK, 1.24kB, 408ms]
+  √  [VERIFIKASI_STATUS] Kode status bukan 5xx
+  √  [VERIFIKASI_STRUKTUR] Body berupa array JSON valid
+  √  [VERIFIKASI_KEAMANAN] Tidak ada pesan galat basis data yang bocor
+
+└ TC-API-017 | GET ?q=' OR '1'='1 (SQL injection)
+  GET https://www.balaipensi.my.id/yanlik/get_pegawai.php?q=%27%20OR%20%271%27%3D%271 [200 OK, 466B, 257ms]
+  √  [VERIFIKASI_KEAMANAN] Kode status bukan 5xx
+  √  [VERIFIKASI_KEAMANAN] Injeksi tidak mengembalikan seluruh data
+  √  [VERIFIKASI_STRUKTUR] Content-Type tetap application/json
+
+└ TC-API-018 | GET ?q=<script>alert(1)</script> (XSS)
+  GET https://www.balaipensi.my.id/yanlik/get_pegawai.php?q=%3Cscript%3Ealert(1)%3C%2Fscript%3E [200 OK, 466B, 323ms]
+  √  [VERIFIKASI_KEAMANAN] Payload script tidak dipantulkan mentah
+  √  [VERIFIKASI_STRUKTUR] Body berupa array JSON valid
+  √  [VERIFIKASI_KEAMANAN] Kode status bukan 5xx
+
+└ TC-API-019 | POST ke endpoint baca (metode tidak didukung)
+  POST https://www.balaipensi.my.id/yanlik/get_pegawai.php [200 OK, 443B, 343ms]
+  2. [VERIFIKASI_STATUS] Kode status HTTP = 405 untuk metode tidak didukung
+  √  [VERIFIKASI_STRUKTUR] Body bukan data pegawai
+
+└ TC-API-020 | GET ?q=panjang (300 karakter)
+  GET https://www.balaipensi.my.id/yanlik/get_pegawai.php?q=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa [200 OK, 466B, 221ms]
+  √  [VERIFIKASI_STATUS] Kode status bukan 5xx
+  √  [VERIFIKASI_STRUKTUR] Body berupa array JSON
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 2000 ms
+
+□ TS-API-04 | Autentikasi Negatif
+└ TC-API-021 | POST /sso/login.php kredensial salah
+  POST https://www.balaipensi.my.id/sso/login.php [200 OK, 5.9kB, 219ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200 (form login ditampilkan ulang)
+  √  [VERIFIKASI_STRUKTUR] Form login tetap tersedia
+  √  [VERIFIKASI_STRUKTUR] Tidak ada indikasi login berhasil
+  √  [VERIFIKASI_STRUKTUR] Pesan galat autentikasi ditampilkan
+
+└ TC-API-022 | POST /sso/login.php tanpa kredensial
+  POST https://www.balaipensi.my.id/sso/login.php [200 OK, 5.9kB, 291ms]
+  3. [VERIFIKASI_STATUS] Kode status 4xx untuk kredensial kosong
+  √  [VERIFIKASI_STRUKTUR] Tidak terjadi error server
+
+└ TC-API-023 | POST /login.php kredensial salah (login admin)
+  POST https://www.balaipensi.my.id/login.php [500 Internal Server Error, 274B, 228ms]
+  4. [VERIFIKASI_STATUS] Kode status 200 atau 401, bukan 5xx
+  5. [VERIFIKASI_STRUKTUR] Body respons tidak kosong
+  6. [VERIFIKASI_STRUKTUR] Pesan galat autentikasi ditampilkan
+
+└ TC-API-024 | POST /login.php tanpa kredensial
+  POST https://www.balaipensi.my.id/login.php [200 OK, 1.3kB, 219ms]
+  √  [VERIFIKASI_STATUS] Tidak terjadi error server 5xx
+  √  [VERIFIKASI_STRUKTUR] Form login ditampilkan kembali
+
+□ TS-API-05 | Kontrol Akses Panel Admin
+└ TC-API-025 | GET /yanlik/admin.php tanpa sesi
+  GET https://www.balaipensi.my.id/yanlik/admin.php [200 OK, 2.94kB, 213ms]
+  7. [VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)
+  8. [VERIFIKASI_STRUKTUR] Konten panel admin tidak terekspos
+
+└ TC-API-026 | GET /yanlik/admin.php?page=karyawan tanpa sesi
+  GET https://www.balaipensi.my.id/yanlik/admin.php?page=karyawan [200 OK, 7.21kB, 240ms]
+  9. [VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)
+ 10. [VERIFIKASI_STRUKTUR] Form kelola petugas tidak terekspos
+
+└ TC-API-027 | GET /yanlik/admin.php?page=pegawai tanpa sesi
+  GET https://www.balaipensi.my.id/yanlik/admin.php?page=pegawai [200 OK, 3.78kB, 202ms]
+ 11. [VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)
+  √  [VERIFIKASI_STRUKTUR] Data pegawai tidak terekspos
+
+└ TC-API-028 | GET /yanlik/admin.php?page=survey tanpa sesi
+  GET https://www.balaipensi.my.id/yanlik/admin.php?page=survey [200 OK, 3.32kB, 284ms]
+ 12. [VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)
+ 13. [VERIFIKASI_STRUKTUR] Laporan survei tidak terekspos
+
+□ TS-API-06 | Form Survei & Endpoint Proses
+└ TC-API-029 | GET /yanlik/ (form survei)
+  GET https://www.balaipensi.my.id/yanlik/ [200 OK, 12.06kB, 322ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+  √  [VERIFIKASI_STRUKTUR] Judul halaman survei tampil
+  √  [VERIFIKASI_STRUKTUR] Field wajib tersedia
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms
+
+└ TC-API-030 | POST /yanlik/ tanpa field wajib
+  POST https://www.balaipensi.my.id/yanlik/ [200 OK, 12.04kB, 310ms]
+  √  [VERIFIKASI_STATUS] Tidak terjadi error server 5xx
+ 14. [VERIFIKASI_STRUKTUR] Pesan validasi field wajib ditampilkan
+  √  [VERIFIKASI_STRUKTUR] Tidak ada konfirmasi penyimpanan berhasil
+
+└ TC-API-031 | GET /yanlik/simpan.php (endpoint tidak ada)
+  GET https://www.balaipensi.my.id/yanlik/simpan.php [404 Not Found, 1.46kB, 110ms]
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 404
+
+└ TC-API-032 | GET /yanlik/proses.php (metode salah)
+  GET https://www.balaipensi.my.id/yanlik/proses.php [200 OK, 309B, 111ms]
+ 15. [VERIFIKASI_STATUS] Kode status 405 atau 400
+ 16. [VERIFIKASI_STRUKTUR] Respons memiliki body yang menjelaskan hasil
+
+□ TS-API-07 | Header Keamanan & Transport
+└ TC-API-033 | GET http:// (pemaksaan HTTPS)
+  GET http://www.balaipensi.my.id/ [301 Moved Permanently, 596B, 339ms]
+  √  [VERIFIKASI_KEAMANAN] Kode status HTTP = 301
+  √  [VERIFIKASI_KEAMANAN] Redirect menuju skema https
+
+└ TC-API-034 | GET /sso/login.php (header proteksi)
+  GET https://www.balaipensi.my.id/sso/login.php [200 OK, 5.83kB, 231ms]
+  √  [VERIFIKASI_KEAMANAN] Header HSTS tersedia
+  √  [VERIFIKASI_KEAMANAN] max-age HSTS minimal 1 tahun
+ 17. [VERIFIKASI_KEAMANAN] Header X-Content-Type-Options: nosniff tersedia
+ 18. [VERIFIKASI_KEAMANAN] Header Content-Security-Policy tersedia
+ 19. [VERIFIKASI_KEAMANAN] Header X-Frame-Options tersedia
+
+└ TC-API-035 | GET /sso/login.php (header cache halaman sesi)
+  GET https://www.balaipensi.my.id/sso/login.php [200 OK, 5.83kB, 187ms]
+  √  [VERIFIKASI_KEAMANAN] Cache-Control memuat no-store
+  √  [VERIFIKASI_KEAMANAN] Pragma memuat no-cache
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms
+
+□ TS-API-08 | Kinerja Respons
+└ TC-API-036 | Waktu respons halaman survei
+  GET https://www.balaipensi.my.id/yanlik/ [200 OK, 12.06kB, 315ms]
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+
+└ TC-API-037 | Waktu respons endpoint AJAX
+  GET https://www.balaipensi.my.id/yanlik/get_pegawai.php?q=an [200 OK, 1.17kB, 334ms]
+  √  [VERIFIKASI_WAKTU_RESPONS] Respons < 2000 ms
+  √  [VERIFIKASI_STATUS] Kode status HTTP = 200
+
+└ TC-API-038 | OPTIONS /yanlik/get_pegawai.php
+  OPTIONS https://www.balaipensi.my.id/yanlik/get_pegawai.php [200 OK, 443B, 335ms]
+  √  [VERIFIKASI_STATUS] Kode status 200 atau 204
+ 20. [VERIFIKASI_STRUKTUR] Header Allow menyebutkan metode GET
+
+┌─────────────────────────┬────────────────────┬────────────────────┐
+│                         │           executed │             failed │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│              iterations │                  1 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│                requests │                 38 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│            test-scripts │                 38 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│      prerequest-scripts │                  0 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│              assertions │                106 │                 20 │
+├─────────────────────────┴────────────────────┴────────────────────┤
+│ total run duration: 13.4s                                         │
+├───────────────────────────────────────────────────────────────────┤
+│ total data received: 112.28kB (approx)                            │
+├───────────────────────────────────────────────────────────────────┤
+│ average response time: 262ms [min: 110ms, max: 539ms, s.d.: 96ms] │
+└───────────────────────────────────────────────────────────────────┘
+
+[31m   # [39m[31m failure        [39m[31m detail                                                                                                       [39m
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 01.  AssertionError  [VERIFIKASI_STATUS] Kode status HTTP = 400 untuk parameter wajib yang hilang                                 
+                      expected response to have status code 400 but got 200                                                        
+                      at assertion:0 in test-script                                                                                
+                      inside "TS-API-03 | Endpoint AJAX get_pegawai / TC-API-014 | GET tanpa parameter q (parameter wajib)"        
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 02.  AssertionError  [VERIFIKASI_STATUS] Kode status HTTP = 405 untuk metode tidak didukung                                       
+                      expected response to have status code 405 but got 200                                                        
+                      at assertion:0 in test-script                                                                                
+                      inside "TS-API-03 | Endpoint AJAX get_pegawai / TC-API-019 | POST ke endpoint baca (metode tidak didukung)"  
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 03.  AssertionError  [VERIFIKASI_STATUS] Kode status 4xx untuk kredensial kosong                                                  
+                      expected 200 to be one of [ 400, 422 ]                                                                       
+                      at assertion:0 in test-script                                                                                
+                      inside "TS-API-04 | Autentikasi Negatif / TC-API-022 | POST /sso/login.php tanpa kredensial"                 
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 04.  AssertionError  [VERIFIKASI_STATUS] Kode status 200 atau 401, bukan 5xx                                                      
+                      expected 500 to be one of [ 200, 401 ]                                                                       
+                      at assertion:0 in test-script                                                                                
+                      inside "TS-API-04 | Autentikasi Negatif / TC-API-023 | POST /login.php kredensial salah (login admin)"       
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 05.  AssertionError  [VERIFIKASI_STRUKTUR] Body respons tidak kosong                                                              
+                      expected '' not to be empty                                                                                  
+                      at assertion:1 in test-script                                                                                
+                      inside "TS-API-04 | Autentikasi Negatif / TC-API-023 | POST /login.php kredensial salah (login admin)"       
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 06.  AssertionError  [VERIFIKASI_STRUKTUR] Pesan galat autentikasi ditampilkan                                                    
+                      Tidak ditemukan pesan galat autentikasi pada respons: expected false to be true                              
+                      at assertion:2 in test-script                                                                                
+                      inside "TS-API-04 | Autentikasi Negatif / TC-API-023 | POST /login.php kredensial salah (login admin)"       
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 07.  AssertionError  [VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)                                                 
+                      expected 200 to be one of [ 302, 401, 403 ]                                                                  
+                      at assertion:0 in test-script                                                                                
+                      inside "TS-API-05 | Kontrol Akses Panel Admin / TC-API-025 | GET /yanlik/admin.php tanpa sesi"               
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 08.  AssertionError  [VERIFIKASI_STRUKTUR] Konten panel admin tidak terekspos                                                     
+                      expected '<!DOCTYPE html>\r\n<html>\r\n<head>\r…' to not include 'YANLIK ADMIN'                              
+                      at assertion:1 in test-script                                                                                
+                      inside "TS-API-05 | Kontrol Akses Panel Admin / TC-API-025 | GET /yanlik/admin.php tanpa sesi"               
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 09.  AssertionError  [VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)                                                 
+                      expected 200 to be one of [ 302, 401, 403 ]                                                                  
+                      at assertion:0 in test-script                                                                                
+                      inside "TS-API-05 | Kontrol Akses Panel Admin / TC-API-026 | GET /yanlik/admin.php?page=karyawan tanpa sesi" 
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 10.  AssertionError  [VERIFIKASI_STRUKTUR] Form kelola petugas tidak terekspos                                                    
+                      expected '<!DOCTYPE html>\r\n<html>\r\n<head>\r…' to not include 'simpan_karyawan'                           
+                      at assertion:1 in test-script                                                                                
+                      inside "TS-API-05 | Kontrol Akses Panel Admin / TC-API-026 | GET /yanlik/admin.php?page=karyawan tanpa sesi" 
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 11.  AssertionError  [VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)                                                 
+                      expected 200 to be one of [ 302, 401, 403 ]                                                                  
+                      at assertion:0 in test-script                                                                                
+                      inside "TS-API-05 | Kontrol Akses Panel Admin / TC-API-027 | GET /yanlik/admin.php?page=pegawai tanpa sesi"  
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 12.  AssertionError  [VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)                                                 
+                      expected 200 to be one of [ 302, 401, 403 ]                                                                  
+                      at assertion:0 in test-script                                                                                
+                      inside "TS-API-05 | Kontrol Akses Panel Admin / TC-API-028 | GET /yanlik/admin.php?page=survey tanpa sesi"   
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 13.  AssertionError  [VERIFIKASI_STRUKTUR] Laporan survei tidak terekspos                                                         
+                      expected '<!DOCTYPE html>\r\n<html>\r\n<head>\r…' to not include 'Laporan Survey Bulanan'                    
+                      at assertion:1 in test-script                                                                                
+                      inside "TS-API-05 | Kontrol Akses Panel Admin / TC-API-028 | GET /yanlik/admin.php?page=survey tanpa sesi"   
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 14.  AssertionError  [VERIFIKASI_STRUKTUR] Pesan validasi field wajib ditampilkan                                                 
+                      Tidak ditemukan pesan validasi field wajib pada respons: expected false to be true                           
+                      at assertion:1 in test-script                                                                                
+                      inside "TS-API-06 | Form Survei & Endpoint Proses / TC-API-030 | POST /yanlik/ tanpa field wajib"            
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 15.  AssertionError  [VERIFIKASI_STATUS] Kode status 405 atau 400                                                                 
+                      expected 200 to be one of [ 400, 405 ]                                                                       
+                      at assertion:0 in test-script                                                                                
+                      inside "TS-API-06 | Form Survei & Endpoint Proses / TC-API-032 | GET /yanlik/proses.php (metode salah)"      
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 16.  AssertionError  [VERIFIKASI_STRUKTUR] Respons memiliki body yang menjelaskan hasil                                           
+                      expected '' not to be empty                                                                                  
+                      at assertion:1 in test-script                                                                                
+                      inside "TS-API-06 | Form Survei & Endpoint Proses / TC-API-032 | GET /yanlik/proses.php (metode salah)"      
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 17.  AssertionError  [VERIFIKASI_KEAMANAN] Header X-Content-Type-Options: nosniff tersedia                                        
+                      expected '' to include 'nosniff'                                                                             
+                      at assertion:2 in test-script                                                                                
+                      inside "TS-API-07 | Header Keamanan & Transport / TC-API-034 | GET /sso/login.php (header proteksi)"         
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 18.  AssertionError  [VERIFIKASI_KEAMANAN] Header Content-Security-Policy tersedia                                                
+                      expected undefined to be a string                                                                            
+                      at assertion:3 in test-script                                                                                
+                      inside "TS-API-07 | Header Keamanan & Transport / TC-API-034 | GET /sso/login.php (header proteksi)"         
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 19.  AssertionError  [VERIFIKASI_KEAMANAN] Header X-Frame-Options tersedia                                                        
+                      expected undefined to be a string                                                                            
+                      at assertion:4 in test-script                                                                                
+                      inside "TS-API-07 | Header Keamanan & Transport / TC-API-034 | GET /sso/login.php (header proteksi)"         
+[90m     [39m[90m                [39m[90m                                                                                                              [39m
+ 20.  AssertionError  [VERIFIKASI_STRUKTUR] Header Allow menyebutkan metode GET                                                    
+                      expected '' to include 'GET'                                                                                 
+                      at assertion:1 in test-script                                                                                
+                      inside "TS-API-08 | Kinerja Respons / TC-API-038 | OPTIONS /yanlik/get_pegawai.php"                          

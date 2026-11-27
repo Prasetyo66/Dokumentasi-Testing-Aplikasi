@@ -1,0 +1,1273 @@
+{
+  "info": {
+    "_postman_id": "b5d1f0a2-7c44-4a63-9f0e-1d82c3a6e701",
+    "name": "Balai Pensi API QA - Black-Box Testing",
+    "description": "Koleksi pengujian API black-box (positif dan negatif) untuk https://www.balaipensi.my.id. Disusun mengikuti alur TD1-TD6 ISO/IEC/IEEE 29119-5 dan kosakata ISO/IEC/IEEE 29119-1. Setiap request memakai keyword VERIFIKASI_STATUS, VERIFIKASI_STRUKTUR, VERIFIKASI_WAKTU_RESPONS, dan VERIFIKASI_KEAMANAN. Seluruh data masukan bersifat sintetis; tidak ada kredensial asli, token, atau data pribadi yang disimpan di koleksi ini.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "TS-API-01 | Portal & Routing Publik",
+      "description": "Test set untuk memverifikasi perilaku routing portal publik: redirect root, halaman portal, directory index, dan penanganan 404.",
+      "item": [
+        {
+          "name": "TC-API-001 | GET / (redirect ke portal SSO)",
+          "description": "Kondisi: pengguna membuka root domain. Diharapkan server mengalihkan ke /sso/index.php dengan status 302.",
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 302\", function () {",
+                  "    pm.response.to.have.status(302);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Header Location mengarah ke /sso/index.php\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/sso/index.php\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Content-Type berupa HTML\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/"
+          }
+        },
+        {
+          "name": "TC-API-002 | GET /sso/index.php (portal layanan)",
+          "description": "Kondisi: portal layanan publik diakses langsung. Diharapkan 200 OK dan halaman memuat judul portal serta tautan login pegawai.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Content-Type berupa HTML\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Halaman memuat judul portal\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Portal Layanan Terpadu\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Halaman memuat tautan Login Pegawai (SSO)\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Login Pegawai (SSO)\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/sso/index.php"
+          }
+        },
+        {
+          "name": "TC-API-003 | GET /sso/ (directory index)",
+          "description": "Kondisi: direktori /sso/ diakses tanpa nama berkas. Diharapkan 200 OK dan menampilkan portal yang sama dengan /sso/index.php.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Halaman memuat judul portal\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Portal Layanan Terpadu\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/sso/"
+          }
+        },
+        {
+          "name": "TC-API-004 | GET /index.php (redirect internal)",
+          "description": "Kondisi: /index.php diakses. Diharapkan redirect diteruskan dan halaman portal tampil dengan status akhir 200.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status akhir HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Halaman akhir adalah portal layanan\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Portal Layanan Terpadu\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/index.php"
+          }
+        },
+        {
+          "name": "TC-API-005 | GET halaman tidak ada (404)",
+          "description": "Kondisi negatif: path yang tidak terdaftar diminta. Diharapkan 404 Not Found, bukan 200 atau 500.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Content-Type berupa HTML\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/halaman-tidak-ada-qa-2026"
+          }
+        },
+        {
+          "name": "TC-API-006 | HEAD /sso/index.php (metadata respons)",
+          "description": "Kondisi: klien meminta metadata saja. Diharapkan 200 OK dengan header HSTS dan tanpa body.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Header Strict-Transport-Security tersedia\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Strict-Transport-Security\")).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "HEAD",
+            "header": [],
+            "url": "{{baseUrl}}/sso/index.php"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TS-API-02 | Halaman Login & Sesi",
+      "description": "Test set untuk memverifikasi ketersediaan halaman login dan perilaku proteksi sesi pada halaman internal SSO.",
+      "item": [
+        {
+          "name": "TC-API-007 | GET /sso/login.php (form login pegawai)",
+          "description": "Kondisi: halaman login SSO dibuka. Diharapkan 200 OK dan form memuat field username serta password.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Judul halaman adalah Login Pegawai SSO\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Login Pegawai SSO\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Form memuat field username dan password\", function () {",
+                  "    const html = pm.response.text();",
+                  "    pm.expect(html).to.include(\"name=\\\"username\\\"\");",
+                  "    pm.expect(html).to.include(\"name=\\\"password\\\"\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/sso/login.php"
+          }
+        },
+        {
+          "name": "TC-API-008 | GET /login.php (form login admin)",
+          "description": "Kondisi: halaman login admin dibuka. Diharapkan 200 OK dan form memuat field username serta password.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Judul halaman adalah Login Admin\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Login Admin\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Form memuat field username dan password\", function () {",
+                  "    const html = pm.response.text();",
+                  "    pm.expect(html).to.include(\"name=\\\"username\\\"\");",
+                  "    pm.expect(html).to.include(\"name=\\\"password\\\"\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/login.php"
+          }
+        },
+        {
+          "name": "TC-API-009 | GET /yanlik/login.php (login admin survei)",
+          "description": "Kondisi: halaman login admin aplikasi survei dibuka. Diharapkan 200 OK dan form login tampil.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Judul halaman adalah Login Admin\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Login Admin\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/yanlik/login.php"
+          }
+        },
+        {
+          "name": "TC-API-010 | GET /sso/dashboard.php tanpa sesi",
+          "description": "Kondisi negatif: halaman dashboard diakses tanpa sesi login. Diharapkan 302 ke login.php, bukan 200 berisi data internal.",
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 302\", function () {",
+                  "    pm.response.to.have.status(302);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Redirect menuju halaman login\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Location\")).to.include(\"login.php\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/sso/dashboard.php"
+          }
+        },
+        {
+          "name": "TC-API-011 | GET /sso/logout.php tanpa sesi",
+          "description": "Kondisi negatif: logout dipanggil tanpa sesi. Diharapkan 302 ke login.php dan bukan error 500.",
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 302\", function () {",
+                  "    pm.response.to.have.status(302);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Redirect menuju halaman login\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Location\")).to.include(\"login.php\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/sso/logout.php"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TS-API-03 | Endpoint AJAX get_pegawai",
+      "description": "Test set untuk endpoint JSON /yanlik/get_pegawai.php yang dipakai autocomplete nama penilai. Fokus: struktur JSON, penanganan parameter, dan ketahanan masukan berbahaya.",
+      "item": [
+        {
+          "name": "TC-API-012 | GET ?q=an (pencarian valid)",
+          "description": "Kondisi positif: kata kunci valid dikirim. Diharapkan 200 OK, Content-Type application/json, array tidak kosong, setiap item memiliki nama_pegawai dan nip bertipe string, respons < 2000 ms.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Content-Type application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Body berupa array JSON tidak kosong\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.be.an(\"array\");",
+                  "    pm.expect(body.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Setiap item memiliki nama_pegawai dan nip berupa string\", function () {",
+                  "    const body = pm.response.json();",
+                  "    body.forEach(function (item) {",
+                  "        pm.expect(item).to.have.property(\"nama_pegawai\");",
+                  "        pm.expect(item).to.have.property(\"nip\");",
+                  "        pm.expect(item.nama_pegawai).to.be.a(\"string\");",
+                  "        pm.expect(item.nip).to.be.a(\"string\");",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 2000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxApiResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{pathAjaxPegawai}}?q={{qValid}}"
+          }
+        },
+        {
+          "name": "TC-API-013 | GET ?q=zzzz_tidak_ada (hasil kosong)",
+          "description": "Kondisi negatif: kata kunci tidak cocok dengan data apa pun. Diharapkan 200 OK dengan array kosong, bukan error.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Body berupa array JSON kosong\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.be.an(\"array\");",
+                  "    pm.expect(body).to.be.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 2000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxApiResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{pathAjaxPegawai}}?q={{qNoMatch}}"
+          }
+        },
+        {
+          "name": "TC-API-014 | GET tanpa parameter q (parameter wajib)",
+          "description": "Kondisi negatif: parameter wajib q tidak dikirim. Mengikuti kontrak API, server seharusnya menolak dengan 400 Bad Request. Perilaku aktual dicatat pada laporan.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 400 untuk parameter wajib yang hilang\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Body tetap berupa array JSON\", function () {",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 2000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxApiResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{pathAjaxPegawai}}"
+          }
+        },
+        {
+          "name": "TC-API-015 | GET ?q=a (batas panjang kata kunci)",
+          "description": "Kondisi batas: kata kunci satu karakter. UI menetapkan minimal 3 karakter sebelum memanggil endpoint, sehingga server diuji apakah ikut menegakkan batas tersebut.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Body berupa array JSON\", function () {",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Kata kunci 1 karakter tetap dilayani tanpa error\", function () {",
+                  "    pm.expect(pm.response.json().length).to.be.above(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{pathAjaxPegawai}}?q={{qShort}}"
+          }
+        },
+        {
+          "name": "TC-API-016 | GET ?q=%27 (karakter kutip tunggal)",
+          "description": "Kondisi negatif: masukan berisi kutip tunggal untuk menguji penanganan karakter khusus dan ketahanan terhadap SQL injection.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status bukan 5xx\", function () {",
+                  "    pm.expect(pm.response.code).to.be.below(500);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Body berupa array JSON valid\", function () {",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Tidak ada pesan galat basis data yang bocor\", function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    pm.expect(text).to.not.include(\"sql syntax\");",
+                  "    pm.expect(text).to.not.include(\"mysqli\");",
+                  "    pm.expect(text).to.not.include(\"pdoexception\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{pathAjaxPegawai}}?q=%27"
+          }
+        },
+        {
+          "name": "TC-API-017 | GET ?q=' OR '1'='1 (SQL injection)",
+          "description": "Kondisi negatif keamanan: payload SQL injection klasik dikirim. Diharapkan endpoint tidak mengeksekusi injeksi dan tidak mengembalikan seluruh data.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Kode status bukan 5xx\", function () {",
+                  "    pm.expect(pm.response.code).to.be.below(500);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Injeksi tidak mengembalikan seluruh data\", function () {",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\").and.to.be.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Content-Type tetap application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{pathAjaxPegawai}}?q=%27%20OR%20%271%27%3D%271"
+          }
+        },
+        {
+          "name": "TC-API-018 | GET ?q=<script>alert(1)</script> (XSS)",
+          "description": "Kondisi negatif keamanan: payload XSS dikirim. Diharapkan respons tidak memantulkan tag script secara mentah dan tetap JSON valid.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Payload script tidak dipantulkan mentah\", function () {",
+                  "    pm.expect(pm.response.text().toLowerCase()).to.not.include(\"<script\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Body berupa array JSON valid\", function () {",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Kode status bukan 5xx\", function () {",
+                  "    pm.expect(pm.response.code).to.be.below(500);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{pathAjaxPegawai}}?q=%3Cscript%3Ealert(1)%3C%2Fscript%3E"
+          }
+        },
+        {
+          "name": "TC-API-019 | POST ke endpoint baca (metode tidak didukung)",
+          "description": "Kondisi negatif: metode POST dikirim ke endpoint baca. Diharapkan 405 Method Not Allowed. Perilaku aktual dicatat pada laporan.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 405 untuk metode tidak didukung\", function () {",
+                  "    pm.response.to.have.status(405);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Body bukan data pegawai\", function () {",
+                  "    pm.expect(pm.response.text().toLowerCase()).to.not.include(\"nama_pegawai\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "q",
+                  "value": "{{qValid}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}{{pathAjaxPegawai}}"
+          }
+        },
+        {
+          "name": "TC-API-020 | GET ?q=panjang (300 karakter)",
+          "description": "Kondisi batas: kata kunci 300 karakter. Diharapkan server menangani tanpa error 5xx dan tetap mengembalikan JSON.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status bukan 5xx\", function () {",
+                  "    pm.expect(pm.response.code).to.be.below(500);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Body berupa array JSON\", function () {",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 2000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxApiResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{pathAjaxPegawai}}?q={{qLong}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TS-API-04 | Autentikasi Negatif",
+      "description": "Test set autentikasi dengan kredensial sintetis tidak valid. Tidak ada akun atau kredensial asli yang digunakan.",
+      "item": [
+        {
+          "name": "TC-API-021 | POST /sso/login.php kredensial salah",
+          "description": "Kondisi negatif: username dan password sintetis yang salah dikirim. Diharapkan halaman login kembali tampil dengan pesan galat yang jelas, tanpa membuat sesi.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200 (form login ditampilkan ulang)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Form login tetap tersedia\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"name=\\\"password\\\"\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Tidak ada indikasi login berhasil\", function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    pm.expect(text).to.not.include(\"dashboard\");",
+                  "    pm.expect(text).to.not.include(\"keluar\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Pesan galat autentikasi ditampilkan\", function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const adaPesan = /(kata sandi|password|kredensial|username|pengguna)[^<]{0,80}(salah|tidak valid|gagal|invalid)/.test(text);",
+                  "    pm.expect(adaPesan, \"Tidak ditemukan pesan galat autentikasi pada respons\").to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{qaUser}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{qaPassword}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/sso/login.php"
+          }
+        },
+        {
+          "name": "TC-API-022 | POST /sso/login.php tanpa kredensial",
+          "description": "Kondisi negatif: body kosong dikirim. Validasi sisi server diharapkan menolak dengan 400 Bad Request atau 422 Unprocessable Entity.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status 4xx untuk kredensial kosong\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 422]);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Tidak terjadi error server\", function () {",
+                  "    pm.expect(pm.response.code).to.be.below(500);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": "{{baseUrl}}/sso/login.php"
+          }
+        },
+        {
+          "name": "TC-API-023 | POST /login.php kredensial salah (login admin)",
+          "description": "Kondisi negatif: kredensial admin sintetis yang salah dikirim. Diharapkan respons terkendali (200 dengan pesan galat atau 401), bukan 500 Internal Server Error.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status 200 atau 401, bukan 5xx\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 401]);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Body respons tidak kosong\", function () {",
+                  "    pm.expect(pm.response.text()).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Pesan galat autentikasi ditampilkan\", function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const adaPesan = text.includes(\"error-msg\") || text.includes(\"salah\") || text.includes(\"gagal\") || text.includes(\"invalid\");",
+                  "    pm.expect(adaPesan, \"Tidak ditemukan pesan galat autentikasi pada respons\").to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{qaUser}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{qaPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "login",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/login.php"
+          }
+        },
+        {
+          "name": "TC-API-024 | POST /login.php tanpa kredensial",
+          "description": "Kondisi negatif: body kosong dikirim ke login admin. Diharapkan tidak terjadi error server; form login ditampilkan kembali.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Tidak terjadi error server 5xx\", function () {",
+                  "    pm.expect(pm.response.code).to.be.below(500);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Form login ditampilkan kembali\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"name=\\\"password\\\"\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": "{{baseUrl}}/login.php"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TS-API-05 | Kontrol Akses Panel Admin",
+      "description": "Test set keamanan otorisasi: seluruh halaman panel admin /yanlik/admin.php diakses tanpa sesi. Diharapkan ditolak dengan 302 ke login, 401, atau 403.",
+      "item": [
+        {
+          "name": "TC-API-025 | GET /yanlik/admin.php tanpa sesi",
+          "description": "Kondisi negatif: dashboard admin diakses tanpa autentikasi. Diharapkan redirect ke login atau 401/403, bukan halaman admin.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([302, 401, 403]);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Konten panel admin tidak terekspos\", function () {",
+                  "    pm.expect(pm.response.text()).to.not.include(\"YANLIK ADMIN\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/yanlik/admin.php"
+          }
+        },
+        {
+          "name": "TC-API-026 | GET /yanlik/admin.php?page=karyawan tanpa sesi",
+          "description": "Kondisi negatif: modul kelola petugas diakses tanpa sesi. Diharapkan ditolak karena memuat form perubahan data.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([302, 401, 403]);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Form kelola petugas tidak terekspos\", function () {",
+                  "    pm.expect(pm.response.text()).to.not.include(\"simpan_karyawan\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/yanlik/admin.php?page=karyawan"
+          }
+        },
+        {
+          "name": "TC-API-027 | GET /yanlik/admin.php?page=pegawai tanpa sesi",
+          "description": "Kondisi negatif: modul pencarian data pegawai diakses tanpa sesi. Diharapkan ditolak karena memuat data pribadi kepegawaian.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([302, 401, 403]);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Data pegawai tidak terekspos\", function () {",
+                  "    pm.expect(pm.response.text()).to.not.match(/\\b\\d{18}\\b/);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/yanlik/admin.php?page=pegawai"
+          }
+        },
+        {
+          "name": "TC-API-028 | GET /yanlik/admin.php?page=survey tanpa sesi",
+          "description": "Kondisi negatif: laporan hasil survei diakses tanpa sesi. Diharapkan ditolak karena memuat data responden.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Akses tanpa sesi ditolak (302/401/403)\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([302, 401, 403]);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Laporan survei tidak terekspos\", function () {",
+                  "    pm.expect(pm.response.text()).to.not.include(\"Laporan Survey Bulanan\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/yanlik/admin.php?page=survey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TS-API-06 | Form Survei & Endpoint Proses",
+      "description": "Test set validasi form survei publik. Pengujian dibatasi pada permintaan tanpa data lengkap agar tidak membuat baris data baru di lingkungan produksi.",
+      "item": [
+        {
+          "name": "TC-API-029 | GET /yanlik/ (form survei)",
+          "description": "Kondisi positif: halaman survei publik dibuka. Diharapkan 200 OK dan seluruh field wajib tersedia.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Judul halaman survei tampil\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Penilaian Pelanggan\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Field wajib tersedia\", function () {",
+                  "    const html = pm.response.text();",
+                  "    pm.expect(html).to.include(\"name=\\\"nama_penilai\\\"\");",
+                  "    pm.expect(html).to.include(\"name=\\\"id_karyawan\\\"\");",
+                  "    pm.expect(html).to.include(\"name=\\\"kepuasan\\\"\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{pathYanlik}}"
+          }
+        },
+        {
+          "name": "TC-API-030 | POST /yanlik/ tanpa field wajib",
+          "description": "Kondisi negatif: hanya penanda simpan dikirim tanpa nama, NIP, petugas, dan kepuasan. Diharapkan tidak terjadi 5xx dan tersedia pesan validasi yang jelas.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Tidak terjadi error server 5xx\", function () {",
+                  "    pm.expect(pm.response.code).to.be.below(500);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Pesan validasi field wajib ditampilkan\", function () {",
+                  "    const text = pm.response.text().toLowerCase();",
+                  "    const adaValidasi = /<div class=\\\"alert[^>]*>[^<]*(wajib|tidak boleh kosong|lengkapi|gagal)/.test(text);",
+                  "    pm.expect(adaValidasi, \"Tidak ditemukan pesan validasi field wajib pada respons\").to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Tidak ada konfirmasi penyimpanan berhasil\", function () {",
+                  "    pm.expect(pm.response.text().toLowerCase()).to.not.include(\"berhasil disimpan\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "simpan",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}{{pathYanlik}}"
+          }
+        },
+        {
+          "name": "TC-API-031 | GET /yanlik/simpan.php (endpoint tidak ada)",
+          "description": "Kondisi negatif: menebak endpoint simpan alternatif. Diharapkan 404 sehingga tidak ada handler tak terdokumentasi.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/yanlik/simpan.php"
+          }
+        },
+        {
+          "name": "TC-API-032 | GET /yanlik/proses.php (metode salah)",
+          "description": "Kondisi negatif: handler proses diakses dengan GET. Diharapkan 405 Method Not Allowed atau 400, bukan 200 dengan body kosong.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status 405 atau 400\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 405]);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Respons memiliki body yang menjelaskan hasil\", function () {",
+                  "    pm.expect(pm.response.text()).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/yanlik/proses.php"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TS-API-07 | Header Keamanan & Transport",
+      "description": "Test set non-fungsional keamanan: pemaksaan HTTPS, header proteksi respons, dan atribut cookie sesi.",
+      "item": [
+        {
+          "name": "TC-API-033 | GET http:// (pemaksaan HTTPS)",
+          "description": "Kondisi: permintaan melalui HTTP polos. Diharapkan 301 ke URL HTTPS.",
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Kode status HTTP = 301\", function () {",
+                  "    pm.response.to.have.status(301);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Redirect menuju skema https\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Location\")).to.match(/^https:\\/\\//);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{httpBaseUrl}}/"
+          }
+        },
+        {
+          "name": "TC-API-034 | GET /sso/login.php (header proteksi)",
+          "description": "Kondisi: respons halaman login diperiksa headernya. Diharapkan HSTS, X-Content-Type-Options, Content-Security-Policy, dan X-Frame-Options tersedia.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Header HSTS tersedia\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Strict-Transport-Security\")).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] max-age HSTS minimal 1 tahun\", function () {",
+                  "    const hsts = pm.response.headers.get(\"Strict-Transport-Security\") || \"\";",
+                  "    const cocok = /max-age=(\\d+)/.exec(hsts);",
+                  "    pm.expect(cocok, \"max-age tidak ditemukan\").to.not.be.null;",
+                  "    pm.expect(Number(cocok[1])).to.be.at.least(31536000);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Header X-Content-Type-Options: nosniff tersedia\", function () {",
+                  "    pm.expect((pm.response.headers.get(\"X-Content-Type-Options\") || \"\").toLowerCase()).to.include(\"nosniff\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Header Content-Security-Policy tersedia\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Security-Policy\")).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Header X-Frame-Options tersedia\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"X-Frame-Options\")).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/sso/login.php"
+          }
+        },
+        {
+          "name": "TC-API-035 | GET /sso/login.php (header cache halaman sesi)",
+          "description": "Kondisi: halaman login yang memuat token sesi diperiksa headernya. Diharapkan respons tidak dapat disimpan cache (no-store) dan memakai Pragma no-cache.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Cache-Control memuat no-store\", function () {",
+                  "    pm.expect((pm.response.headers.get(\"Cache-Control\") || \"\").toLowerCase()).to.include(\"no-store\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_KEAMANAN] Pragma memuat no-cache\", function () {",
+                  "    pm.expect((pm.response.headers.get(\"Pragma\") || \"\").toLowerCase()).to.include(\"no-cache\");",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxResponseTimeMs\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/sso/login.php"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TS-API-08 | Kinerja Respons",
+      "description": "Test set non-fungsional efisiensi kinerja (ISO/IEC 25010 time behaviour): ambang respons halaman 3000 ms dan endpoint API 2000 ms.",
+      "item": [
+        {
+          "name": "TC-API-036 | Waktu respons halaman survei",
+          "description": "Kondisi: halaman survei dimuat. Diharapkan respons di bawah 3000 ms.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 3000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxResponseTimeMs\")));",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{pathYanlik}}"
+          }
+        },
+        {
+          "name": "TC-API-037 | Waktu respons endpoint AJAX",
+          "description": "Kondisi: autocomplete memanggil endpoint JSON. Diharapkan respons di bawah 2000 ms agar layak untuk interaksi real-time.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_WAKTU_RESPONS] Respons < 2000 ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get(\"maxApiResponseTimeMs\")));",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status HTTP = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}{{pathAjaxPegawai}}?q={{qValid}}"
+          }
+        },
+        {
+          "name": "TC-API-038 | OPTIONS /yanlik/get_pegawai.php",
+          "description": "Kondisi: klien menanyakan metode yang didukung. Diharapkan 200/204 dengan header Allow yang menyebutkan GET.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"[VERIFIKASI_STATUS] Kode status 200 atau 204\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});",
+                  "",
+                  "pm.test(\"[VERIFIKASI_STRUKTUR] Header Allow menyebutkan metode GET\", function () {",
+                  "    const allow = pm.response.headers.get(\"Allow\") || \"\";",
+                  "    pm.expect(allow.toUpperCase()).to.include(\"GET\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "OPTIONS",
+            "header": [],
+            "url": "{{baseUrl}}{{pathAjaxPegawai}}"
+          }
+        }
+      ]
+    }
+  ]
+}
