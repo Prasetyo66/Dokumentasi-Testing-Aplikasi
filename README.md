@@ -1,2 +1,6 @@
-# Dokumentasi-Testing-Aplikasi
-Tugas Kuliah Testing dan QA Perangkat Lunak
+
+Kelompok 3
+- Tri Prasetyo
+- alya shasalbilla
+- Rizky Hermawan
+- Leo
